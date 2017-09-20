@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App Web Sharings</title>
+</head>
+<body>
+
+<div class="container">
+    <div class="topBar">
+        <div class="titleContainer">
+            <div class="pryvLogo">
+                <a href="http://api.pryv.com/" target="_blank">
+                    <img src="img/loader.gif" id="loading"><img>
+                    <img src="img/logo-pryv.png" id="logo-pryv"><img>
+                </a>
+            </div>
+            <div class="title">
+                <h3>App Web Sharings</h3>
+            </div>
+        </div>
+        <div class="buttonContainer">
+            <span id="pryv-button"></span>
+        </div>
+    </div>
+</div><br>
+
+<div id="patientView">
+  <form action="javascript:createSharing();">
+    By clicking on "Create sharing", the patient 
+    <input id="firstname" type="text" name="firstname" placeholder="First name">
+    <input id="lastname" type="text" name="lastname" placeholder="Last name">
+    authorize the doctor to access the patient data.<br><br>
+    <input type="submit" value="Create sharing">
+  </form>
+</div><br>
+
+<div class="container">
+  <table id="sharings"></table>
+</div>
+
+</body>
+<link href="css/style.css" rel="stylesheet" type="text/css"/>
+<script src="pryv.js"></script>
+<script src="index.js"></script>
+</html>
