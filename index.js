@@ -17,7 +17,6 @@ var doctor = {
  * retrieve the registerURL from URL parameters
  */
 function getRegisterURL() {
-  // domain : pryv.utility.urls.parseClientURL().parseQuery().domain ?
   return pryv.utility.urls.parseClientURL().parseQuery()['reg-pryv'] || pryv.utility.urls.parseClientURL().parseQuery()['pryv-reg'];
 }
 
@@ -26,6 +25,7 @@ if (customRegisterUrl) {
   pryv.Auth.config.registerURL = {host: customRegisterUrl, 'ssl': true};
 }
 
+// TODO: make sure to have a configurable domain at any step or not at all
 var domain = pryv.utility.urls.parseClientURL().parseQuery().domain || 'pryv.me';
 
 document.onreadystatechange = function () {
@@ -63,6 +63,7 @@ document.onreadystatechange = function () {
           } else {
             getSharingsAsPatient();
             // Check if there is a new sharing to create
+            // TODO: Make this within a confirmation popup
             var urlParams = new URLSearchParams(window.location.search);
             var token = urlParams.get("token");
             if(token != null) {
