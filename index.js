@@ -169,8 +169,8 @@ function askForSharing() {
   // Allows patient to later store its sharing inside doctor account
   // TODO: delete all these entries for patient in doctor account when not needed anymore...
   var stream = {
-    name: patientUsername,
-    id: patientUsername,
+    name: patientUsername.value,
+    id: patientUsername.value,
     parentId: patientsStreamId
   };
   // Prepare patient stream in doctor account
@@ -180,10 +180,10 @@ function askForSharing() {
       return alert('Impossible to ask for sharing');
     }
     var access = {
-      name: 'Ask patient' + patientUsername + 'for sharing',
+      name: 'Ask patient' + patientUsername.value + 'for sharing',
       permissions: [
         {
-          streamId: patientUsername,
+          streamId: patientUsername.value,
           level: 'contribute'
         }
       ]
