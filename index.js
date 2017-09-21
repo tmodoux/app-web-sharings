@@ -100,6 +100,7 @@ function getSharingsAsDoctor() {
     }
     sharingEvents.forEach(function (sharing) {
       // Check if sharing is still valid (not revoked)
+      // TODO: Replace with an email from patient notifying the revocation
       var patientConnection = new pryv.Connection({
         username: sharing.content.username,
         auth: sharing.content.token,
@@ -165,13 +166,14 @@ function createSharing(doctorToken) {
 
 function askForSharing() {
   // Allows patient to later store its sharing inside doctor account
+  // TODO: delete all these entries for patient in doctor account when not needed anymore...
   var stream = {
     name: patientUsername,
     id: patientUsername,
     parentId: patientsStreamId
   };
   // Prepare patient stream in doctor account
-  connection.streams.create(stream, function (err, streamCreated) { 
+  connection.streams.create(stream, function (err) { 
     if(err) {
       console.log(err);
       return alert('Impossible to ask for sharing');
