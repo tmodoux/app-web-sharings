@@ -6,7 +6,7 @@ var patientsStreamId = 'patients';
 var doctor = {
     name: 'Nadia',
     username: 'nadia16',
-    token: 'cj7qbqxm200hh0bnw4zah844g'
+    email: 'tmodoux@pryv.com'
 };
 var firstname = document.getElementById("firstname");
 var lastname = document.getElementById("lastname");
@@ -38,6 +38,9 @@ var doctorConnection = new pryv.Connection({
 document.onreadystatechange = function () {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('logo-pryv').style.display = 'block';
+  
+  document.getElementById('doctorName').innerHTML = doctor.name;
+  
   var state = document.readyState;
   if (state == 'complete') {
     // Authenticate user
@@ -122,71 +125,89 @@ function createSharing() {
       return alert('Impossible to create sharing');
     }
     updateSharingsTable(accessCreated);
-    
-    // Store access token in doctor account
-    var event = {
-      streamId: patientsStreamId,
-      type: 'numset/patient',
-      content: {
-        name: firstname.value + ' ' + lastname.value,
-        username: connection.username,
-        token: accessCreated.token
-      },
-    };
-    doctorConnection.events.create(event, function (err, eventCreated) { 
-      if(err) {
-        console.log(err);
-        return alert('Impossible to store sharing in doctor account');
-      }
-    });
   });
+}
+
+function notifyDoctor(access) {
+  var msg = encodeURIComponent('Dear ' + doctor.name + ',\n\n'
+  + 'The patient "' + lastname.value + ' ' + firstname.value + '"'
+  + ' would like to share data with you through the following link:\n\n'
+  + 'https://app-web-sharings/sharings?'
+  + 'lastname=' + lastname.value
+  + '&firstname=' + firstname.value
+  + '&username=' + connection.username
+  + '&domain=' + domain
+  + '&token=' + access.token);
+  
+  var subject = encodeURIComponent('Pryv sharing');
+  
+  window.location.href = 'mailto:' + doctor.email
+    + '?subject=Pryv&body=' + msg;
 }
 
 function visualizationLink(access) {
   var visualizationInterface = 'https://pryv.github.io/app-web-plotly/?';
   return '<a target="_blank" href='+ visualizationInterface
     + 'username='+access.content.username+'&'
-    + 'domain='+domain+'&'
+    + 'domain='+domain+'&'  
     + 'auth='+access.content.token +'>Show graphs</a>'
 }
 
 function initSharingsTable() {
   var tr = document.createElement("tr");
-  var th1 = document.createElement("th");
-  var th2 = document.createElement("th");
   
   if(connection.username === doctor.username) {
+    var th1 = document.createElement("th");
+    var th2 = document.createElement("th");
     th1.innerHTML = 'Patient name';
     th2.innerHTML = 'Sharing link';
+    tr.appendChild(th1);
+    tr.appendChild(th2);
   } else {
+    var th1 = document.createElement("th");
+    var th2 = document.createElement("th");
+    var th3 = document.createElement("th");
     th1.innerHTML = 'Sharing name';
     th2.innerHTML = 'Revoke';
+    th3.innerHTML = 'Notify doctor';
+    tr.appendChild(th1);
+    tr.appendChild(th2);
+    tr.appendChild(th3);
   }
-  tr.appendChild(th1);
-  tr.appendChild(th2);
   sharingsTable.appendChild(tr);
   sharingsTable.style.display = 'block';
 }
 
 function updateSharingsTable(access) {
   var tr = document.createElement("tr");
-  var td1 = document.createElement("td");
-  var td2 = document.createElement("td");
   
   if(connection.username === doctor.username) {
+    var td1 = document.createElement("td");
+    var td2 = document.createElement("td");
     td1.innerHTML = access.content.name;
     td2.innerHTML = visualizationLink(access);
+    tr.appendChild(td1);
+    tr.appendChild(td2);
   } else {
+    var td1 = document.createElement("td");
+    var td2 = document.createElement("td");
+    var td3 = document.createElement("td");
     td1.innerHTML = access.name;
-    var btn = document.createElement("button");
-    btn.onclick = function() {
+    var btn1 = document.createElement("button");
+    btn1.onclick = function() {
       revokeSharing(access);
       this.parentNode.parentNode.innerHTML="";
     }
-    td2.appendChild(btn);
+    var btn2 = document.createElement("button");
+    btn2.onclick = function() {
+      notifyDoctor(access);
+    }
+    td2.appendChild(btn1);
+    td3.appendChild(btn2);
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    tr.appendChild(td3);
   }
-  tr.appendChild(td1);
-  tr.appendChild(td2);
   sharingsTable.appendChild(tr);
 }
 
@@ -196,24 +217,5 @@ function revokeSharing(access) {
       console.log(err);
       return alert('Impossible to revoke sharing');
     }
-    // Delete on doctor account
-    var filter = new pryv.Filter({streams : [patientsStreamId]});
-    doctorConnection.events.get(filter, function (err, events) {
-      if(err) {
-        console.log(err);
-        return alert('Impossible to delete sharing in doctor account');
-      }
-      events.forEach(function(event) {
-        if(event.content.token === access.token) {
-          console.log(event);
-          doctorConnection.events.delete({id: event.id}, function (err, events) {
-            if(err) {
-              console.log(err);
-              return alert('Impossible to delete sharing in doctor account');
-            }
-          });
-        }
-      });
-    });
   });
 }
