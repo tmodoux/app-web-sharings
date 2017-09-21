@@ -7,6 +7,7 @@ var sharingsTable = document.getElementById("sharings");
 var patientView = document.getElementById("patientView");
 var doctorView = document.getElementById("doctorView");
 var patientEmail = document.getElementById("email");
+var patientUsername = document.getElementById("username");
 var doctor = {
   username : 'nadia16',
   name : 'Nadia'
@@ -50,6 +51,7 @@ document.onreadystatechange = function () {
           sharingsTable.style.display = 'none';
           sharingsTable.innerHTML = "";
           patientEmail.value="";
+          patientUsername.value="";
         },
         needValidation: null,
         signedIn: function (connect) {
@@ -94,10 +96,27 @@ function getSharingsAsDoctor() {
   connection.events.get(filter, function (err, sharingEvents) {
     if(err) {
       console.log(err);
-      return alert('Impossible to get sharings as doctor');
+      return alert('Impossible to get sharings');
     }
     sharingEvents.forEach(function (sharing) {
-      updateSharingsTable(sharing);
+      // Check if sharing is still valid (not revoked)
+      var patientConnection = new pryv.Connection({
+        username: sharing.content.username,
+        auth: sharing.content.token,
+        domain: domain
+      });
+      patientConnection.accessInfo(function (err) {
+        // Remove revoked sharings
+        if(err) {
+          connection.events.delete({id:sharing.id}, function (err) {
+            if(err) {
+              console.log(err);
+            }
+          });
+        } else {
+          updateSharingsTable(sharing);
+        }
+      });
     });
   });
 }
@@ -122,7 +141,7 @@ function createSharing(doctorToken) {
     
     // Store access token in doctor account
     var event = {
-      streamId: patientsStreamId,
+      streamId: connection.username,
       type: 'patient/sharing',
       content: {
         username: connection.username,
@@ -146,28 +165,41 @@ function createSharing(doctorToken) {
 
 function askForSharing() {
   // Allows patient to later store its sharing inside doctor account
-  var access = {
-    name: 'Ask for sharing ' + patientEmail.value,
-    permissions: [
-      {
-        streamId: "*", // TODO: only patient stream?
-        level: 'contribute'
-      }
-    ]
+  var stream = {
+    name: patientUsername,
+    id: patientUsername,
+    parentId: patientsStreamId
   };
-  console.log(connection.username);
-  connection.accesses.create(access, function (err, accessCreated) {
+  // Prepare patient stream in doctor account
+  connection.streams.create(stream, function (err, streamCreated) { 
     if(err) {
       console.log(err);
       return alert('Impossible to ask for sharing');
     }
-    var link = window.location + "?token=" + accessCreated.token;
-    var subject = encodeURIComponent('Pryv sharing');
-    var msg = encodeURIComponent('Hello,\n\n The doctor ' + doctor.name
-      + ' would like to have access to your patient data:\n\n'
-      + link);
-    window.location.href = 'mailto:' + patientEmail.value
-      + '?subject=' + subject + '&body=' + msg;
+    var access = {
+      name: 'Ask patient' + patientUsername + 'for sharing',
+      permissions: [
+        {
+          streamId: patientUsername,
+          level: 'contribute'
+        }
+      ]
+    };
+    // Give access to patient
+    connection.accesses.create(access, function (err, accessCreated) {
+      if(err) {
+        console.log(err);
+        return alert('Impossible to ask for sharing');
+      }
+      // Send email to patient
+      var link = window.location + "?token=" + accessCreated.token;
+      var subject = encodeURIComponent('Pryv sharing');
+      var msg = encodeURIComponent('Hello,\n\n The doctor ' + doctor.name
+        + ' would like to have access to your patient data:\n\n'
+        + link);
+      window.location.href = 'mailto:' + patientEmail.value
+        + '?subject=' + subject + '&body=' + msg;
+    });
   });
 }
 
@@ -225,6 +257,5 @@ function revokeSharing(access) {
       console.log(err);
       return alert('Impossible to revoke sharing');
     }
-    // TODO: delete on doctor account
   });
 }
