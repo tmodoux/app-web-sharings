@@ -25,13 +25,12 @@
     </div>
 </div><br>
 
-<div id="doctorView">
-  <form action="javascript:askForSharing();">
-    By clicking on "Ask for sharing", the following patient will receive a request
-    for sharing its data with you:
-    <br><br><input id="email" type="text" name="email" placeholder="patient@email.com">
-    <br><input id="username" type="text" name="username" placeholder="patient username">
-    <br><br><input type="submit" value="Ask for sharing">
+<div id="patientView">
+  <form action="javascript:createSharing();">
+    By clicking on "Create sharing", you authorize the doctor
+    <span id="doctorName"></span>
+    to access your patient data.<br><br>
+    <input type="submit" value="Create sharing">
   </form>
 </div><br>
 

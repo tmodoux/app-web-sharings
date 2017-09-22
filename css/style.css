@@ -87,6 +87,6 @@ body {
     display: inline-block;
 }
 
-#logo-pryv, #patientView, #doctorView {
+#logo-pryv, #patientView {
     display: none;
 }
