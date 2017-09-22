@@ -24,6 +24,7 @@ if (customRegisterUrl) {
   pryv.Auth.config.registerURL = {host: customRegisterUrl, 'ssl': true};
 }
 
+// TODO: make sure to have a configurable domain at any step or not at all
 var domain = pryv.utility.urls.parseClientURL().parseQuery().domain || 'pryv.me';
 
 var doctorConnection = new pryv.Connection({
@@ -155,7 +156,7 @@ function createSharing() {
 }
 
 function notifyDoctor(sharing) {
-     var link = window.location + "?token=" + sharing.token + '&username=' + connection.username;
+     var link = window.location.pathname + "?token=" + sharing.token + '&username=' + connection.username;
      var subject = encodeURIComponent('Pryv sharing');
      var msg = encodeURIComponent('Hello,\n\n The patient ' + connection.username
        + ' would like to share its data with you:\n\n'
