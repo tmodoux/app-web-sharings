@@ -166,7 +166,7 @@ function notifyDoctor(sharing) {
 }
 
 function visualizationLink(sharing) {
-  var visualizationInterface = 'https://pryv.github.io/app-web-plotly/?';
+  var visualizationInterface = 'https://tmodoux.github.io/app-web-plotly-lsi/?';
   return visualizationInterface
     + 'username='+sharing.content.username+'&'
     + 'domain='+domain+'&'  
