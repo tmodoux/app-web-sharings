@@ -156,7 +156,7 @@ function createSharing() {
 }
 
 function notifyDoctor(sharing) {
-     var link = window.location.pathname + "?token=" + sharing.token + '&username=' + connection.username;
+     var link = window.location.href.split('?')[0] + "?token=" + sharing.token + '&username=' + connection.username;
      var subject = encodeURIComponent('Pryv sharing');
      var msg = encodeURIComponent('Hello,\n\n The patient ' + connection.username
        + ' would like to share its data with you:\n\n'
