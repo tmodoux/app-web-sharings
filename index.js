@@ -92,6 +92,34 @@ function initSharingsAsPatient() {
 }
 
 function initSharingsAsDoctor() {
+  // Check if there is a new sharing to create
+  // TODO: Make this within a confirmation popup
+  var urlParams = new URLSearchParams(window.location.search);
+  var token = urlParams.get("token");
+  var username = urlParams.get("username");
+  if(token != null && username != null) {
+    // Store new sharing in doctor account
+    var event = {
+      streamId: patientsStreamId,
+      type: 'patient/sharing',
+      content: {
+        username: username,
+        token: token
+      },
+    };
+    connection.events.create(event, function (err, sharingEvent) { 
+      if(err) {
+        console.log(err);
+        alert('Impossible to store sharing in doctor account');
+      }
+      retrieveSharings();
+    });
+  } else {
+    retrieveSharings();
+  }
+}
+
+function retrieveSharings() {
   // Get existing sharings
   var filter = new pryv.Filter({streams : [patientsStreamId]});
   connection.events.get(filter, function (err, sharingEvents) {
@@ -102,30 +130,6 @@ function initSharingsAsDoctor() {
     sharingEvents.forEach(function (sharing) {
       updateSharingsTable(sharing);
     });
-    
-    // Check if there is a new sharing to create
-    // TODO: Make this within a confirmation popup
-    var urlParams = new URLSearchParams(window.location.search);
-    var token = urlParams.get("token");
-    var username = urlParams.get("username");
-    if(token != null && username != null) {
-      // Store new sharing in doctor account
-      var event = {
-        streamId: patientsStreamId,
-        type: 'patient/sharing',
-        content: {
-          username: username,
-          token: token
-        },
-      };
-      connection.events.create(event, function (err, sharingEvent) { 
-        if(err) {
-          console.log(err);
-          return alert('Impossible to store sharing in doctor account');
-        }
-        updateSharingsTable(sharingEvent);
-      });
-    }
   });
 }
 
