@@ -6,7 +6,7 @@ var patientsStreamId = 'patients';
 var doctor = {
     name: 'Nadia',
     username: 'nadia16',
-    email: 'tmodoux@pryv.com'
+    email: 'nadiatamburrano@hotmail.com'
 };
 var sharingsTable = document.getElementById("sharings");
 var patientView = document.getElementById("patientView");
@@ -139,7 +139,7 @@ function createSharing() {
     permissions: [
       {
         streamId: '*',
-        level: 'contribute'
+        level: 'manage'
       }
     ]
   };
