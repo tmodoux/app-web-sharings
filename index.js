@@ -6,7 +6,7 @@ var patientsStreamId = 'patients';
 var doctor = {
     name: 'Nadia',
     username: 'nadia16',
-    email: 'nadiatamburrano@hotmail.com'
+    email: 'francesca.stradolini@gmail.com'
 };
 var sharingsTable = document.getElementById("sharings");
 var patientView = document.getElementById("patientView");
